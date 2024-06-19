@@ -1,43 +1,36 @@
 package com.duydan.mysecurity.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.NoArgsConstructor;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
+@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    private String name;
     private String email;
     private String password;
     private boolean enabled;
+    private Long departmentId;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> roles = new HashSet<>();
-
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
-
-    public void addRole(Role role) {
-        UserRole userRole = new UserRole(this, role);
-        roles.add(userRole);
-    }
-
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_role",
+            joinColumns=@JoinColumn(name = "user_id"),
+            inverseJoinColumns=@JoinColumn(name = "role_id"))
+    private List<Role> roles = new ArrayList<>();
 }

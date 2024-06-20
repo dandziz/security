@@ -1,5 +1,6 @@
 package com.duydan.mysecurity.utils;
 
+import com.duydan.mysecurity.entities.Role;
 import com.duydan.mysecurity.entities.UserRole;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -14,10 +15,10 @@ import java.util.Set;
  */
 public class CommonUtils {
 
-    public static List<SimpleGrantedAuthority> buildSimpleGrantedAuthorities(final Set<UserRole> userRoles) {
+    public static List<SimpleGrantedAuthority> buildSimpleGrantedAuthorities(final List<Role> userRoles) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (UserRole userRole : userRoles) {
-            authorities.add(new SimpleGrantedAuthority(userRole.getRole().getName()));
+        for (Role role : userRoles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
     }

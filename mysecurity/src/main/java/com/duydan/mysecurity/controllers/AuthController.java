@@ -1,28 +1,23 @@
 package com.duydan.mysecurity.controllers;
 
-import com.duydan.mysecurity.entities.AuthUser;
 import com.duydan.mysecurity.entities.User;
 import com.duydan.mysecurity.dto.requests.LoginRequest;
+import com.duydan.mysecurity.exceptions.Exception;
 import com.duydan.mysecurity.serviceImpls.AuthUserService;
 import com.duydan.mysecurity.services.UserService;
-import com.duydan.mysecurity.utils.JwtHelper;
+import com.duydan.mysecurity.utils.JwtUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,11 +26,11 @@ public class AuthController {
     private final UserService userService;
     private final AuthUserService authUserService;
     private final AuthenticationManager authenticationManager;
-    private final JwtHelper helper;
+    private final JwtUtils helper;
 
     @GetMapping("/")
     public ResponseEntity<String> index() throws Exception {
-        throw new Exception("No One");
+        throw new Exception("Không ổn!");
     }
 
     @PostMapping(value = "/register")
@@ -49,7 +44,6 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails userDetails = authUserService.loadUserByUsername(loginRequest.getUsername());
-        String token = this.helper.generateToken(userDetails);
-        return token;
+        return this.helper.generateToken(userDetails.getUsername());
     }
 }

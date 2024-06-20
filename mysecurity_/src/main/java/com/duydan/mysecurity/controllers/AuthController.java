@@ -1,9 +1,12 @@
 package com.duydan.mysecurity.controllers;
 
-import com.duydan.mysecurity.entities.LocalUser;
+import com.duydan.mysecurity.entities.AuthUser;
 import com.duydan.mysecurity.entities.User;
 import com.duydan.mysecurity.dto.requests.LoginRequest;
+import com.duydan.mysecurity.serviceImpls.AuthUserService;
 import com.duydan.mysecurity.services.UserService;
+import com.duydan.mysecurity.utils.JwtHelper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,48 +29,27 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtEncoder encoder;
+    private final AuthUserService authUserService;
     private final AuthenticationManager authenticationManager;
+    private final JwtHelper helper;
 
     @GetMapping("/")
-    public ResponseEntity<String> index() {
-        return ResponseEntity.ok("Hello World");
-    }
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<String> index() throws Exception {
+        throw new Exception("No One");
     }
 
     @PostMapping(value = "/register")
     public User register(@RequestBody User user) {
-        return userService.save(user);
+        return userService.register(user);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        //return new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getEmail(),  loginRequest.getPassword()));
+    public String login(@Valid @RequestBody LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        LocalUser localUser = (LocalUser) authentication.getPrincipal();
-        return getToken(localUser);
-    }
 
-    private String getToken(LocalUser localUser) {
-        Instant now = Instant.now();
-        long expiry = 36000L;
-        // @formatter:off
-        String scope = localUser.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiry))
-                .subject(localUser.getUsername())
-                .claim("scope", scope)
-                .build();
-        // @formatter:on
-        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        UserDetails userDetails = authUserService.loadUserByUsername(loginRequest.getUsername());
+        String token = this.helper.generateToken(userDetails);
+        return token;
     }
 }

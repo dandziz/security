@@ -27,7 +27,7 @@ public class User {
     private boolean enabled;
     private Long departmentId;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
             joinColumns=@JoinColumn(name = "user_id"),

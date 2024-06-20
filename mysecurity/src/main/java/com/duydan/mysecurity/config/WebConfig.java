@@ -1,4 +1,4 @@
-package com.duydan.mysecurity.beans;
+package com.duydan.mysecurity.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

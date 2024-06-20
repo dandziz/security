@@ -26,28 +26,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    @Value("${jwt.public.key}")
-//    RSAPublicKey key;
-//
-//    @Value("${jwt.private.key}")
-//    RSAPrivateKey privateKey;
-
-    private final JwtAuthenticationEntryPoint point;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter filter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
+        System.err.println("HELLO");
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/").hasAuthority("SCOPE_ADMIN")
+                .requestMatchers("/").hasAuthority("ADMIN")
                 .anyRequest().permitAll())
             .cors((cors) -> cors
                 .configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-//            .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
-            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling((exception)-> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -76,7 +71,13 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
-        return builder.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+        return new ProviderManager(authenticationProvider);
     }
 }

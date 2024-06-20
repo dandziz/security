@@ -1,6 +1,5 @@
 package com.duydan.mysecurity.filters;
 
-import com.duydan.mysecurity.exceptions.Exception;
 import com.duydan.mysecurity.serviceImpls.AuthUserService;
 import com.duydan.mysecurity.utils.JwtUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -26,9 +25,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private Logger logger = LoggerFactory.getLogger(OncePerRequestFilter.class);
-    @Autowired
-    private JwtUtils jwtUtils;
+
+    private final JwtUtils jwtUtils;
     private final AuthUserService authUserService;
 
 
@@ -42,7 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String userName = null;
         if (authHeader != null && authHeader.startsWith("Bearer")) {
             token = authHeader.substring(7);
-            userName = jwtUtils.extractUserName(token);
+            try {
+                userName = jwtUtils.extractUserName(token);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = authUserService.loadUserByUsername(userName);

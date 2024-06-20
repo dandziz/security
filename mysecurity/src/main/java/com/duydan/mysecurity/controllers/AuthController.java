@@ -29,8 +29,8 @@ public class AuthController {
     private final JwtUtils helper;
 
     @GetMapping("/")
-    public ResponseEntity<String> index() throws Exception {
-        throw new Exception("Không ổn!");
+    public String index() throws Exception {
+        return "Quá ngon";
     }
 
     @PostMapping(value = "/register")

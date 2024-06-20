@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `departments` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table security.departments: ~1 rows (approximately)
+-- Dumping data for table security.departments: ~0 rows (approximately)
 INSERT INTO `departments` (`id`, `name`, `location`, `created_date`, `modified_date`) VALUES
 	(1, 'Data Platform P', 'Floor 7', '2024-06-19 15:59:52', '2024-06-19 15:59:52');
 
@@ -40,10 +40,24 @@ CREATE TABLE IF NOT EXISTS `roles` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table security.roles: ~2 rows (approximately)
+-- Dumping data for table security.roles: ~0 rows (approximately)
 INSERT INTO `roles` (`id`, `name`) VALUES
 	(1, 'ADMIN'),
 	(2, 'USER');
+
+-- Dumping structure for table security.tokens
+CREATE TABLE IF NOT EXISTS `tokens` (
+  `id` bigint NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expired` bit(1) NOT NULL DEFAULT b'0',
+  `revoked` bit(1) NOT NULL DEFAULT b'0',
+  `user_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_tokens_users` (`user_id`),
+  CONSTRAINT `FK_tokens_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dumping data for table security.tokens: ~0 rows (approximately)
 
 -- Dumping structure for table security.users
 CREATE TABLE IF NOT EXISTS `users` (
@@ -74,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `user_role` (
   CONSTRAINT `FKj345gk1bovqvfame88rcx7yyx` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table security.user_role: ~2 rows (approximately)
+-- Dumping data for table security.user_role: ~1 rows (approximately)
 INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 	(5, 1),
 	(7, 2);

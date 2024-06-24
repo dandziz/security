@@ -26,23 +26,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint point;
     private final JwtAuthenticationFilter filter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
-        System.err.println("HELLO");
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/").hasAuthority("ADMIN")
+                .requestMatchers("/").hasAuthority("SCOPE_ADMIN")
                 .anyRequest().permitAll())
             .cors((cors) -> cors
                 .configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling((exception)-> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -58,26 +56,8 @@ public class SecurityConfig {
         return source;
     }
 
-//    @Bean
-//    JwtDecoder jwtDecoder() {
-//        return NimbusJwtDecoder.withPublicKey(this.key).build();
-//    }
-//
-//    @Bean
-//    JwtEncoder jwtEncoder() {
-//        JWK jwk = new RSAKey.Builder(this.key).privateKey(this.privateKey).build();
-//        JWKSource<SecurityContext> gawks = new ImmutableJWKSet<>(new JWKSet(jwk));
-//        return new NimbusJwtEncoder(gawks);
-//    }
-
     @Bean
-    public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
-
-        return new ProviderManager(authenticationProvider);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
+        return builder.getAuthenticationManager();
     }
 }

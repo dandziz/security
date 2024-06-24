@@ -36,8 +36,8 @@ public class UserServiceImpl implements UserService {
                 .departmentId(userRequest.getDepartmentId())
                 .build();
         Role userRole = roleRepository.findByName("USER");
-        if (userRole == null)   userRole = roleRepository.save(new Role("USER"));
-        user.setRoles(List.of(userRole));
+        //if (userRole == null)   userRole = roleRepository.save(new Role("USER"));
+        //user.setRoles(List.of(userRole));
         user = userRepository.save(user);
         return user;
     }

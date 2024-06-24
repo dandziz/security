@@ -1,5 +1,6 @@
 package com.duydan.mysecurity.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,5 +33,6 @@ public class User {
             name = "user_role",
             joinColumns=@JoinColumn(name = "user_id"),
             inverseJoinColumns=@JoinColumn(name = "role_id"))
+    @JsonManagedReference
     private List<Role> roles = new ArrayList<>();
 }

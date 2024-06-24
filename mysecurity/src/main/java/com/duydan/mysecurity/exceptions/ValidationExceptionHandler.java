@@ -8,10 +8,12 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestControllerAdvice
 public class ValidationExceptionHandler {
@@ -21,11 +23,17 @@ public class ValidationExceptionHandler {
         if (e.getBindingResult().hasErrors()) {
             Map<String, List<String>> errors = new HashMap<>();
             e.getBindingResult().getAllErrors().forEach((error) -> {
-                String field = ((FieldError) error).getField();
-                String message = error.getDefaultMessage();
-                assert message != null;
-                List<String> messages = List.of(message);
-                errors.put(field, messages);
+                try {
+                    String field = ((FieldError) error).getField();
+                    String message = error.getDefaultMessage();
+                    assert message != null;
+                    List<String> messages = List.of(message);
+                    errors.put(field, messages);
+                } catch (Exception ex) {
+                    int length = Objects.requireNonNull(error.getArguments()).length;
+                    String field = error.getArguments()[length-1].toString();
+                    errors.put(field, List.of(Objects.requireNonNull(error.getDefaultMessage())));
+                }
             });
             return new ResponseEntity<>(new ErrorResponse("Somethings when wrong...", errors), HttpStatus.BAD_REQUEST);
         }

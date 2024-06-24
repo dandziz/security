@@ -1,5 +1,7 @@
 package com.duydan.mysecurity.dto.requests.user;
 
+import com.duydan.mysecurity.common.validation.unique.Unique;
+import com.duydan.mysecurity.entities.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SaveUserRequest {
     @NotEmpty(message = "Username là trường bắt buộc.")
+    @Unique(entity = User.class, fieldName = "username", message = "Username đã tồn tại.")
     private String username;
 
     @NotEmpty(message = "Name là trường bắt buộc.")
@@ -17,6 +20,7 @@ public class SaveUserRequest {
 
     @NotEmpty(message = "Email là trường bắt buộc.")
     @Email(message = "Email không đúng định dạng.")
+    @Unique(entity = User.class, fieldName = "email", message = "Email đã tồn tại.")
     private String email;
 
     @NotEmpty(message = "Password là trường bắt buộc.")

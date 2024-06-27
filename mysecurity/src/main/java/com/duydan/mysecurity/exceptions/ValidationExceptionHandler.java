@@ -1,19 +1,19 @@
 package com.duydan.mysecurity.exceptions;
 
 import com.duydan.mysecurity.dto.responses.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter.*;
+import org.springframework.web.context.request.WebRequest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestControllerAdvice
 public class ValidationExceptionHandler {
@@ -31,7 +31,7 @@ public class ValidationExceptionHandler {
                     errors.put(field, messages);
                 } catch (Exception ex) {
                     int length = Objects.requireNonNull(error.getArguments()).length;
-                    String field = error.getArguments()[length-1].toString();
+                    String field = error.getArguments()[length - 1].toString();
                     errors.put(field, List.of(Objects.requireNonNull(error.getDefaultMessage())));
                 }
             });
@@ -47,5 +47,14 @@ public class ValidationExceptionHandler {
         response.put("message", "Required request body is missing or malformed");
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getConstraintViolations().forEach(cv -> {
+            errors.put(cv.getPropertyPath().toString().split("\\.")[1], cv.getMessage());
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

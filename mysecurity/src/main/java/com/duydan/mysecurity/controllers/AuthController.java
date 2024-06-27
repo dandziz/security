@@ -8,6 +8,8 @@ import com.duydan.mysecurity.serviceImpls.AuthUserService;
 import com.duydan.mysecurity.services.UserService;
 import com.duydan.mysecurity.utils.JwtHelper;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final UserService userService;
@@ -35,8 +36,11 @@ public class AuthController {
     private final JwtHelper helper;
 
     @GetMapping("/")
-    public ResponseEntity<String> index() throws Exception {
-        throw new Exception("No One");
+    public ResponseEntity<String> index(
+            @RequestParam(required = false) @NotNull @Min(10) Integer age,
+            @RequestParam(required = false) @NotNull @Min(10) Integer salary
+    ) {
+        return ResponseEntity.ok(age.toString());
     }
 
     @PostMapping(value = "/register")

@@ -34,7 +34,7 @@ public class SecurityConfig {
         // @formatter:off
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/").hasAuthority("SCOPE_ADMIN")
+                //.requestMatchers("/").hasAuthority("SCOPE_ADMIN")
                 .anyRequest().permitAll())
             .cors((cors) -> cors
                 .configurationSource(corsConfigurationSource()))

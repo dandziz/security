@@ -1,12 +1,10 @@
 package com.duydan.mysecurity.utils;
 
 import com.duydan.mysecurity.entities.Role;
-import com.duydan.mysecurity.entities.UserRole;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *

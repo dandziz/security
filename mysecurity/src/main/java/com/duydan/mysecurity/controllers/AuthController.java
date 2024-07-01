@@ -1,5 +1,6 @@
 package com.duydan.mysecurity.controllers;
 
+import com.duydan.mysecurity.dto.requests.MapRequest;
 import com.duydan.mysecurity.dto.requests.user.ChangePasswordRequest;
 import com.duydan.mysecurity.entities.AuthUser;
 import com.duydan.mysecurity.entities.User;
@@ -62,5 +63,10 @@ public class AuthController {
     public String changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
 
         return "";
+    }
+
+    @PostMapping("/map")
+    public void map(@Valid @RequestBody MapRequest mapRequest) {
+
     }
 }

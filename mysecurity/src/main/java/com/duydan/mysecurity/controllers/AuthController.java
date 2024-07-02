@@ -66,7 +66,10 @@ public class AuthController {
     }
 
     @PostMapping("/map")
-    public void map(@Valid @RequestBody MapRequest mapRequest) {
-
+    public ResponseEntity<?> map(@RequestBody MapRequest mapRequest) {
+        if (mapRequest.getCatRequest() != null && mapRequest.getCatRequest().getAge() != null)
+            return ResponseEntity.ok(10);
+        else
+            return ResponseEntity.ok(5);
     }
 }
